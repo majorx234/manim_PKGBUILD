@@ -2,7 +2,7 @@
 # Maintainer: Stefan Husmann <stefan-husmann@t-online.de>
 
 pkgname='manim'
-pkgver=0.1.10
+pkgver=0.17.1
 pkgrel=1
 pkgdesc="Animation engine for explanatory math videos"
 arch=('any')
@@ -22,21 +22,26 @@ depends=('cairo'
 	 'python-cairocffi'
 	 'python-pydub'
 	 'python-pbr'
+         'python-poetry'
 	)
-makedepends=('git')
+makedepends=(git python-build python-installer python-wheel)
 optdepends=('texlive-bin: latex support'
             'texlive-core: latex support'
             'texlive-latexextra: latex support'
             'texlive-bibtexextra: latex support'
             'tllocalmgr-git: latex support')
-source=("$pkgname-$pkgver.tar.gz::$url/archive/$pkgver.tar.gz")
-sha256sums=('deac2d6d610d812a6f3ccd1faa71ed664e0b38a2609e21cc69743d7486b4ee30')
+source=("$pkgname-$pkgver.tar.gz::$url/archive/v$pkgver.tar.gz")
+sha256sums=('30c10c92f314e74c1d1acd438c8146be72308d36874b72107870be5a853edffc')
+
+build() {
+  cd "${pkgname}-$pkgver"
+  python -m build --wheel --no-isolation
+}
 
 package() {
   cd "${pkgname}-$pkgver"
 	
   install -Dm644 README.md "${pkgdir}/usr/share/doc/${pkgname}/README.md"
   install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
-
-  python ./setup.py install --root="${pkgdir}" --optimize=1
+  python -m installer --destdir="$pkgdir" dist/*.whl
 }
